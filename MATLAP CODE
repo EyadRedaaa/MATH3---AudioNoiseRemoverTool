@@ -1,0 +1,33 @@
+% Audio Noise Remover Tool
+
+clc;     
+clear;   
+close all;
+
+%=============================================================Read audio signal
+[x, fs] = audioread('audio_with_noise.wav'); 
+figure, plot(x), title('Noisy Audio Signal');
+
+% Fourier Transform
+X = fft(x); 
+Fmag = log(1 + abs(X)); 
+figure, plot(Fmag), title('Magnitude Spectrum');
+
+%=============================================================Create frequency filters
+N = length(X);
+f = (0:N-1)*(fs/N); % Frequency axis
+radius = 500; % User-defined radius (can be made interactive)
+cL = f < radius; 
+cH = ~cL; 
+
+%=============================================================Apply filters
+l_X = X .* cL'; 
+h_X = X .* cH'; 
+
+%=============================================================Inverse Fourier Transform
+low_filtered_audio = ifft(l_X); 
+high_filtered_audio = ifft(h_X); 
+
+%=============================================================Play the filtered audio
+sound(low_filtered_audio, fs);
+figure, plot(low_filtered_audio), title('Low-frequency Audio Signal');
